@@ -1,0 +1,278 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var traceid = [[${traceid}]];
+    var spanid = [[${spanid}]];
+    var ajax_url = [[${app_ajax_url}]];
+    
+    var a='';
+    var event_url = [[${app_event_url}]];
+    var event_kafka_url = [[${app_event_kafka_url}]];
+    var id = [[${id}]];
+
+    alert ('in id='+id);
+
+    var full_kafka_url=event_kafka_url+'?id='+id
+    alert ('full_kafka_url '+full_kafka_url) ;
+    
+
+    
+    
+    
+    
+    alert ('XXXtraceid:'+traceid+' spanid:'+spanid+' ajax_url:'+ajax_url+' event_url:'+event_url+' event_kafka_url:'+event_kafka_url);
+
+/*]]>*/
+</script>
+<head>
+    <title>Getting Started: Handling Form Submission</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+	<h1>Result VER 03.02.2019 20:47</h1>
+	<h1 th:text="'Span trace id: ' + ${traceid}"></h1>
+
+<table>
+<tr th:each="instance : ${map}">
+                        <td th:text="${instance.id}"></td>
+                        <td th:text="${instance.content}"></td>
+</tr>
+</table>
+
+    <a href="/greeting">Submit another message</a>
+
+    <div>
+            <p class="greeting-id">The ID is </p>
+            <p class="greeting-content">The content is </p>
+        </div>
+    
+
+<main>
+    <h2>Spring MVC Async</h2>
+    <b>RBE</b><br>
+    <div id="rbe"></div>
+    <b>SSE</b><br>
+    <div id="sse"></div>
+    <b>KAFKA SSE</b><br>
+    <div id="kafkasse"></div>
+    <b>SRB</b><br>
+    <div id="srb"></div>
+</main>    
+    
+<script>
+
+
+
+function processAjaxRequest(divid, file, callbackfunction, async) 
+
+{
+
+ if (typeof(async)=='undefined') async=true;
+
+
+  var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
+           if (xmlhttp.status == 200) {
+        	     alert('Mam odpowiedz'+xmlhttp.responseText);
+        	     alert('xmlhttp.getAllResponseHeaders  '+xmlhttp.getAllResponseHeaders() );
+
+				var headersString="";        	     
+        	     
+        	     
+
+
+        	     // Get the raw header string
+        	     var headers = xmlhttp.getAllResponseHeaders();
+
+        	     // Convert the header string into an array
+        	     // of individual headers
+
+  
+          	     var arr = headers.trim().split(/[\r\n]+/);
+      
+
+     	   
+        	     // Create a map of header names to values
+        	     var headerMap = {};
+        	     arr.forEach(function (line) {
+        	       var parts = line.split(': ');
+        	       var header = parts.shift();
+        	       var value = parts.join(': ');
+        	       headerMap[header] = value;
+        	       
+        	       headersString=headersString+value;
+        	       
+        	     });
+        	     
+        
+        	     alert(headersString);
+        	     
+
+        	     
+        	     
+			callbackfunction(divid, file, xmlhttp.responseText);
+			   alert('after callback');
+           }
+           else if (xmlhttp.status == 400) {
+              alert('There was an error 400');
+           }
+           else {
+               alert('something else other than 200 was returned '+xmlhttp.status);
+               alert('xmlhttp.readyState  '+xmlhttp.readyState );
+//               alert('xmlhttp.getAllResponseHeaders  '+xmlhttp.getAllResponseHeaders() );
+
+           }
+        }
+    };
+
+
+    xmlhttp.open("GET", file, async);
+    // bez poniższego accept nie działa
+    xmlhttp.setRequestHeader("accept", "application/json, application/*+json");
+    xmlhttp.setRequestHeader('Cache-Control', 'no-cache');
+    
+    xmlhttp.setRequestHeader("X-B3-TraceId", traceid);
+    xmlhttp.setRequestHeader("X-B3-SpanId", spanid);
+    xmlhttp.setRequestHeader("X-B3-ParentSpanId", traceid);
+    xmlhttp.setRequestHeader("X-B3-Sampled", "1");
+    xmlhttp.setRequestHeader("MK-X1", "MK-X1VALUE");
+    xmlhttp.setRequestHeader("MK_X2", "MK_X2VALUE");
+//    xmlhttp.setRequestHeader("X-B3-Flags", "1");
+
+    xmlhttp.send();
+			
+}			
+
+function processAjaxupdateRuntimeValues(divid, file, injson) 
+{
+
+	alert ('processAjaxupdateRuntimeValues 1 '+injson);
+
+	 try {
+			var obj = JSON.parse(injson);
+		alert();
+} catch(e) {
+        alert(e); // error in the above string (in this case, yes)!
+    }			
+			
+
+//	alert ('processAjaxupdateRuntimeValues 2');
+			
+											
+}
+
+alert("1");
+
+processAjaxRequest('----', ajax_url,processAjaxupdateRuntimeValues,true); 
+
+
+
+
+//processAjaxRequest('----', 'http://192.168.1.244:9090/HelloImplRestWeb/services/customerservice/customers/123',processAjaxupdateRuntimeValues,true); 
+//processAjaxRequest('----', 'http://springbootmicroservice:9191/api/get-by-email?email=x@x.com',processAjaxupdateRuntimeValues,true); 
+//processAjaxRequest('----', 'http://192.168.1.244:8081/api/test',processAjaxupdateRuntimeValues,false); 
+//processAjaxRequest('----', 'http://rest-service.guides.spring.io/greeting',processAjaxupdateRuntimeValues,true); 
+
+alert("2");
+
+
+//alert("3");
+
+</script>    
+    
+    
+<script>
+
+
+/**
+ * AJAX Helpers.
+ */
+
+var xhr = function(url) {
+  return new Promise(function(resolve, reject) {
+    try {
+      var xmhr = new XMLHttpRequest();
+
+      //Listen for API Response
+      xmhr.onreadystatechange = function() {
+        if (xmhr.readyState == XMLHttpRequest.DONE && xmhr.status == 200) return resolve(xmhr.responseText);
+      };
+
+      //Open connection
+      xmhr.open("GET", url, true);
+      //Additional headers as needed
+      //x.withCredentials = true;
+      //x.setRequestHeader("Accept", "application/json");
+      //x.setRequestHeader("Content-Type", "text/plain");
+
+      //Perform the actual AJAX call
+      xmhr.send();
+
+    } catch (ex) {
+      reject("Exception: Oh CORS's you've made a mistake!");
+    }
+  });
+};
+
+/**
+ * RBE
+ */
+ alert ('before rbe ') ;
+
+ 
+xhr(event_url+'/rbe').then(function(success){
+  var el = document.getElementById('rbe');
+  el.appendChild(document.createTextNode(success));
+  el.appendChild(document.createElement('br'))
+});
+
+alert ('after rbe ') ;
+
+/**
+ * SSE
+ */
+/*
+var sse = new EventSource(event_url+'/sse');
+sse.onmessage = function (evt) {
+  var el = document.getElementById('sse');
+  el.appendChild(document.createTextNode(evt.data));
+  el.appendChild(document.createElement('br'))
+};
+*/
+/**
+ * kafkaSSE
+ */
+
+ 
+alert ('invoking full_kafka_url '+full_kafka_url) ;
+ 
+var kafkasse = new EventSource(full_kafka_url);
+kafkasse.onmessage = function (evt) {
+  var el = document.getElementById('kafkasse');
+  el.appendChild(document.createTextNode(evt.data));
+  el.appendChild(document.createElement('br'))
+};
+
+/**
+ * SRB
+ */
+
+xhr(event_url+'/srb').then(function(success){
+  var el = document.getElementById('srb');
+  el.appendChild(document.createTextNode(success));
+  el.appendChild(document.createElement('br'))
+});
+
+
+
+</script>    
+
+
+</body>
+</html>

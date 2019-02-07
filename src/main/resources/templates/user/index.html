@@ -1,0 +1,99 @@
+
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Hello Spring Security</title>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
+    </head>
+    <body>
+        <div th:substituteby="index::logout"></div>
+        <h1>This is a secured page!</h1>
+        
+       
+<main>
+    <h2>Spring MVC Async</h2>
+    <b>RBE</b><br>
+    <div id="rbe"></div>
+    <b>SSE</b><br>
+    <div id="sse"></div>
+    <b>KAFKA SSE</b><br>
+    <div id="kafkasse"></div>
+    <b>SRB</b><br>
+    <div id="srb"></div>
+</main>    
+    
+<script>
+
+
+/**
+ * AJAX Helpers.
+ */
+
+var xhr = function(url) {
+  return new Promise(function(resolve, reject) {
+    try {
+      var xmhr = new XMLHttpRequest();
+
+      //Listen for API Response
+      xmhr.onreadystatechange = function() {
+        if (xmhr.readyState == XMLHttpRequest.DONE && xmhr.status == 200) return resolve(xmhr.responseText);
+      };
+
+      //Open connection
+      xmhr.open("GET", url, true);
+      //Additional headers as needed
+      //x.withCredentials = true;
+      //xmhr.setRequestHeader("Accept", "application/json");
+      xmhr.setRequestHeader("accept", "application/json, application/*+json");
+      //x.setRequestHeader("Content-Type", "text/plain");
+
+      //Perform the actual AJAX call
+      xmhr.send();
+
+    } catch (ex) {
+      reject("Exception: Oh CORS's you've made a mistake!");
+    }
+  });
+};
+
+
+
+alert ('after rbe ') ;
+
+/**
+ * SSE
+ */
+/*
+var sse = new EventSource(event_url+'/sse');
+sse.onmessage = function (evt) {
+  var el = document.getElementById('sse');
+  el.appendChild(document.createTextNode(evt.data));
+  el.appendChild(document.createElement('br'))
+};
+*/
+/**
+ * kafkaSSE
+ */
+
+ 
+
+ 
+var kafkasse = new EventSource('http://localhost:9191/topics');
+kafkasse.onmessage = function (evt) {
+  alert('ondata '+evt.data);
+  var el = document.getElementById('kafkasse');
+  el.appendChild(document.createTextNode(evt.data));
+  el.appendChild(document.createElement('br'))
+};
+
+
+</script>    
+        
+        
+        
+        <p><a href="/index" th:href="@{/index}">Back to home page</a></p>
+    </body>
+</html>
+
