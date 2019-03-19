@@ -9,8 +9,10 @@
     var ajax_url = [[${app_ajax_url}]];
     
     var a='';
-    var event_url = [[${app_event_url}]];
-    var event_kafka_url = [[${app_event_kafka_url}]];
+//    var event_url = [[${app_event_url}]];
+    var event_url = 'localhost:9191';
+//    var event_kafka_url = [[${app_event_kafka_url}]];
+    var event_kafka_url = 'localhost:9191/events';
     var id = [[${id}]];
 
     alert ('in id='+id);
